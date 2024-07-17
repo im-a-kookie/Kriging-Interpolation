@@ -31,22 +31,21 @@ if (len(_x) != len(_y) or len(_x) != len(_p)):
     print("Fatal Error: Data columns are unmatched sizes!")
     exit(0)
 
-#now iterate
-#first we need a mesh to generate the new points
-#otherwise we end up generating arbitrarily many points
+#First we should automatically calculate something resembling a good bounding area
 
 min_x = np.min(_x)
 min_y = np.min(_y)
 max_x = np.max(_x)
 max_y = np.max(_y)
 
-# should we try to calculate a nice bounding area?
+# Refine the min/max bounds to something tidy
 boundary = refiner.refine_boundary(min_x, min_y, max_x, max_y)
 x0 = boundary[0]
 y0 = boundary[1]
 x1 = boundary[2]
 y1 = boundary[3]
 
+# Print some updates about where it's at
 print(f"Data Bounds: [{min_x},{min_y}] to [{max_x},{max_y}]")
 print(f"View Bounds: [{x0},{y0}] to [{boundary[2]},{boundary[3]}]")
 print(f"Dataset Prepared! Variable: {TARGET_COLUMN}")
@@ -77,23 +76,23 @@ def calculate_spherical_variogram(distances, radius):
 
 
 def compute_kriging(resolution, radius):
-    print("Computing Interpolation...")
 
     # compute the resolution amounts
     # use the resolution as a vertical resolution
     # since that's what screens do. Unsure if this is correct convention for geostatics.
     scale_y = resolution + 1
     scale_x = math.floor(scale_y * (y1 - y0) / (x1 - x0))
+    print(f"Computing {scale_x}x{scale_y} Interpolation...")
 
     #calculate and store the array of all distances
     dists = calculate_distance_matrix(_x, _y)
-    # and the semivariance function
+    # and the semivariance function, which wee can invert now
     inv_variogram = np.linalg.inv(1 - calculate_spherical_variogram(dists, radius))
     
     # calculate the mean and residuals
     mean = np.sum(_p) / count
     residuals = _p - mean
-
+    
     # Create a plot for graphing the interpolated values to
     xaxis = np.linspace(x0, x1, scale_x, endpoint=True)
     yaxis = np.linspace(y0, y1, scale_y, endpoint=True)
@@ -113,8 +112,6 @@ def compute_kriging(resolution, radius):
 
 #set up the plot
 fig, ax = plot.subplots()
-print(fig)
-print(ax)
 
 plot.subplots_adjust(left=0.1, bottom=0.25, right=0.9, top=0.9)
 #set up the heatmap from the interpolated kriging array
