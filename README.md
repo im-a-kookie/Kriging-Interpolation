@@ -6,20 +6,16 @@ Kriging Interpolation is a linear interpolation method, used primarily for geost
 
 # Variogram
 
-First, we need a variogram, which describes the probabilistic values of the considered area around each point. Essentially, in linearly continuous data, particularly geographic and demographic data, we expect adjacent datapoints to transition relatively smoothly. By approximating the approximate gradient of this transition, or 'variation,' a variogram can be constructed which suggests a probable range of values of any point, based on the adjacent values.
-
-For example, say that the height of the terrain changes by an average of 1 meter per unit of the map. Therefore, from a known height reading, if we travel one unit in any direction, we can expect an average change in height of 1 meter. Indeed, we can now calculate the value of this destination probabilistically, creating a probability distribution that can be projected around each point. Many methods exist for calculating this distribution. In this example, a simple Spherical approach has been selected.
+The variogram describes the values of the random variables around a given point. This is a probabilistic description based on the gradients of the provided data, and typically resembles a sigmoid function. Essentially, linearly continuous data (e.g geographic data) transitions relatively smoothly between adjacent points. By finding the average gradient of this transition, we can make statistical predictions about the total change across a given interval.
 
 # Maximize
 
-Second, we must combine these variograms to calculate, in simple terms: the value which best satisfies every overlapping probability distribution. More technically, we simply need to sum up the biased means, of every overlapping distribution at this point. The bias in this case, is essentially given by the "knowability" of the point, for which we can simply use Euclidian distance - as the data can be assumed to be linearly continuous, uncertainty grows very proportionately to the distance from a known value.
+If a value is randomly chosen for a given point, the variogram describes the probability of that value being correct based on the known data. This probability is maximized at the mean value of the probability distribution. Therefore, the sum of the distance-weighted means of all overlapping variograms, provides the best linear prediction of the value at any given point.
 
-Quite usefully, by considering the breadth of the probability distributions at each point, we can also predict, in statistical form, the expected level of uncertainty (or error) at each calculated point.
+By constructing the variogram as a description of the distance of the value from the mean, we can ensure that the sum of the errors is 0, which means that the above linear prediction will be unbiased.
 
 # Summary
 
-Maths is fully vectorized, uses a simple Spherical variogram construction, and uses MatPlotLib to plot the results visually.
-
-Csv data files taken from https://github.com/GeostatsGuy/GeoDataSets/
+Maths is fully vectorized via NumPY and plotted with MatPlotLib. A spherical variogram method is selected as the most common and versatile approach. Variogram selection is currently beyond the scope of this project.
 
 Requires: matplotlib, numPy
