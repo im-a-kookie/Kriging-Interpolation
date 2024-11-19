@@ -2,7 +2,7 @@
 
 A simple example of Kriging Interpolation using Python and NumPy.
 
-Kriging Interpolation is a standard interpolation method with primary use in geostatics. It provides the best unbiased linear prediction of values across linearly continuous datasets. 
+Kriging Interpolation is a standard interpolation method with primary use in geostatics. It provides the best unbiased linear prediction of values across linearly continuous datasets. Kriging interpolation can be broken down into two main components; the variogram and calculation of covariances, and the maximization of the resulting probability field.
 
 # The Variogram
 
