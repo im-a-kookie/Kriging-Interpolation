@@ -6,7 +6,9 @@ Kriging Interpolation is a standard interpolation method with primary use in geo
 
 # The Variogram
 
-The variogram describes the values of the random variables around a given point. This is a probabilistic description based on the gradients of the provided data. Essentially, linearly continuous data (e.g geographic data) transitions relatively smoothly between adjacent points. By finding the average gradient of this transition, we can make statistical predictions about the total change across a given interval.
+The variogram describes the values of the random variables around a given point. This is a probabilistic description based on the gradients of the provided data. Essentially, linearly continuous data (e.g geographic data) transitions relatively smoothly between adjacent points. Through a mathematical description of the gradient of this transition, we can make statistical predictions about the total change across a given interval.
+
+Many different methods exist for creating this mathematical description. In this case, the spherical variogram is selected, being the most common and versatile approach.
 
 # Maximization
 
@@ -16,6 +18,6 @@ By constructing the variogram as a description of the distance of the value from
 
 # Summary
 
-Maths is fully vectorized via NumPY and plotted with MatPlotLib. A spherical variogram method is selected as the most common and versatile approach. Variogram selection is currently beyond the scope of this project.
+Maths is fully vectorized via NumPY and plotted with MatPlotLib. A spherical variogram method is selected as the most common and versatile approach. Variogram selection is an extensive topic beyond the scope of this project.
 
 Requires: matplotlib, numPy
