@@ -1,4 +1,5 @@
 import numpy as np
+
 import matplotlib.pyplot as plot
 from matplotlib.widgets import Slider, Button
 from matplotlib.colors import Normalize
@@ -73,6 +74,14 @@ def calculate_spherical_variogram(distances, radius):
     partials = np.clip(-999, 1, distances / radius)
     variogram = 1.5 * partials - 0.5 * partials**3
     return variogram
+
+# A linear variogram can be constructed simply by the following;
+def calculate_linear_variogram(distances, radius):
+    return distances / radius
+
+# A gaussian variogram can also be made pretty easily
+def calculate_gaussian_variogram(distances, radius):
+    return 1 - np.exp(-(distances / radius) ** 2)
 
 
 def compute_kriging(resolution, radius):
