@@ -26,31 +26,53 @@ _x = np.array(data.get("X"))
 _y = np.array(data.get("Y"))
 _p = np.array(data.get(TARGET_COLUMN))
 
-count = len(_x)
+# Check if any values are NaN in _x, _y, and _p arrays
+if np.isnan(_x).any():
+    print("Warning: X data contains NaN values. Some data removed.")
 
+if np.isnan(_y).any():
+    print("Warning: Y data contains NaN values. Some data removed.")
+
+if np.isnan(_p).any():
+    print("Warning: Value data contains NaN values. Some data removed.")
+
+#strip NaN values
+valid_data_mask = ~(np.isnan(_x) | np.isnan(_y) | np.isnan(_p))
+_x = _x[valid_data_mask]
+_y = _y[valid_data_mask]
+_p = _p[valid_data_mask]
+
+
+count = len(_x)
+# Now check that we have enough data
 if (len(_x) != len(_y) or len(_x) != len(_p)):
     print("Fatal Error: Data columns are unmatched sizes!")
     exit(0)
 
-#First we should automatically calculate something resembling a good bounding area
+#Intuitively, Kriging probably doesn't do so good with less than 3 datapoints
+if(len(_x) <= 3):
+    print("Fatal Error: Insufficient Data!")
+    exit(0)
 
+#First we should automatically calculate something resembling a good bounding area
+#So we should start by finding the maximum constraints of this area
 min_x = np.min(_x)
 min_y = np.min(_y)
 max_x = np.max(_x)
 max_y = np.max(_y)
 
-# Refine the min/max bounds to something tidy
+#Use an external function to reefine this boundary into something tidy
+#The provided function rounds the boundary to the nearest multiple of the order of magnitude
 boundary = refiner.refine_boundary(min_x, min_y, max_x, max_y)
 x0 = boundary[0]
 y0 = boundary[1]
 x1 = boundary[2]
 y1 = boundary[3]
 
-# Print some updates about where it's at
+#Print some informative data about the viewport area and the data displayed
 print(f"Data Bounds: [{min_x},{min_y}] to [{max_x},{max_y}]")
 print(f"View Bounds: [{x0},{y0}] to [{boundary[2]},{boundary[3]}]")
-print(f"Dataset Prepared! Variable: {TARGET_COLUMN}")
-
+print(f"Dataset Prepared! Variable: {TARGET_COLUMN}. Entries: {count}")
 
 # We need to know the distances between every single point in the array
 def calculate_distance_matrix(x, y):
@@ -59,10 +81,9 @@ def calculate_distance_matrix(x, y):
     # Then subtract the x[0] and y[0] values across the matrix
     x_diff = x[:, np.newaxis] - x[np.newaxis, :]
     y_diff = y[:, np.newaxis] - y[np.newaxis, :]
-    # Now compute the euclidiean distances
+    # Now compute the euclidean distances
     distances = np.sqrt(x_diff**2 + y_diff**2)
     return distances
-
 
 # caculates the distances of every point to the given point
 def calculate_distances_to_point(posx, posy, x, y):
@@ -83,7 +104,7 @@ def calculate_linear_variogram(distances, radius):
 def calculate_gaussian_variogram(distances, radius):
     return 1 - np.exp(-(distances / radius) ** 2)
 
-
+#computes the actual kriging interpolation
 def compute_kriging(resolution, radius):
 
     # compute the resolution amounts
@@ -96,7 +117,22 @@ def compute_kriging(resolution, radius):
     #calculate and store the array of all distances
     dists = calculate_distance_matrix(_x, _y)
     # and the semivariance function, which wee can invert now
-    inv_variogram = np.linalg.inv(1 - calculate_spherical_variogram(dists, radius))
+
+    #calculate the covariance matrix based on the variogram (using spherical variogram)
+    cov_matrix = 1 - calculate_spherical_variogram(dists, radius)
+
+    # Very small values in cov_matrix can cause numerical stability
+    # to mimimize this, we should regularize the diagonal by a very small amount
+    epsilon = 1e-6 
+    cov_matrix += epsilon * np.eye(cov_matrix.shape[0]) 
+
+    # Technically we should be able to use Cholesky decomposition,
+    # But it proves inefficient due to multiple linalg solve steps:
+    # L = np.linalg.cholesky(cov_matrix)
+    # Then L*z=local_covariance, which can be solved with linalg.solve
+
+    # However, a straight inversion seems to be dramatically faster with the given dataset:
+    inv_variogram = np.linalg.inv(cov_matrix)
     
     # calculate the mean and residuals
     mean = np.sum(_p) / count
@@ -115,7 +151,11 @@ def compute_kriging(resolution, radius):
             local_distances = calculate_distances_to_point(xaxis[i], yaxis[j], _x, _y)
             local_covariances = 1 - calculate_spherical_variogram(local_distances, radius)
             # the weight values are found by the matrix product of the semivariances
+
+            # straight matrix multiplication is very performant here, even though, intuitively
+            # a decompisition approach should be better
             weights = np.matmul(local_covariances, inv_variogram)
+
             kriging[j,i] = np.sum(residuals * weights) + mean
     return kriging
 
@@ -164,9 +204,11 @@ def do_thing(resolution, radius):
 slider_res_axis = plot.axes([0.25, 0.12, 0.5, 0.03]) 
 slider_rad_axis = plot.axes([0.25, 0.07, 0.5, 0.03]) 
 button_go_axis = plot.axes([0.7, 0.015, 0.1, 0.04])
+
 #and configure the actual slider areas and callbacks
 slider_res = Slider(slider_res_axis, 'Resolution', 10, 400, valinit=chart_resolution, valstep=1)  # Create the slider object
 slider_res.on_changed(update_res)  # Link slider to update function
+
 slider_rad = Slider(slider_rad_axis, 'Radius', 1, (max_x - min_x) * 2**0.5, valinit=variogram_radius, valstep=1)  # Create the slider object
 slider_rad.on_changed(update_rad)  # Link slider to update function
 button = Button(button_go_axis, 'Update')  # Create the button object
