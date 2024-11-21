@@ -10,6 +10,7 @@ import bounding_refine as refiner #simple thing that does magic
 import math
 import threading
 
+# using porosity here because why not. Other csv columns can be used
 TARGET_COLUMN = "porosity"
 
 #default target resolution in horizontal units
@@ -205,14 +206,16 @@ slider_res_axis = plot.axes([0.25, 0.12, 0.5, 0.03])
 slider_rad_axis = plot.axes([0.25, 0.07, 0.5, 0.03]) 
 button_go_axis = plot.axes([0.7, 0.015, 0.1, 0.04])
 
-#and configure the actual slider areas and callbacks
-slider_res = Slider(slider_res_axis, 'Resolution', 10, 400, valinit=chart_resolution, valstep=1)  # Create the slider object
-slider_res.on_changed(update_res)  # Link slider to update function
+#aSet up a slider to modify the vertical resolution of the plotted area
+slider_res = Slider(slider_res_axis, 'Resolution', 10, 400, valinit=chart_resolution, valstep=1)
+slider_res.on_changed(update_res) #link to function
 
-slider_rad = Slider(slider_rad_axis, 'Radius', 1, (max_x - min_x) * 2**0.5, valinit=variogram_radius, valstep=1)  # Create the slider object
-slider_rad.on_changed(update_rad)  # Link slider to update function
-button = Button(button_go_axis, 'Update')  # Create the button object
-button.on_clicked(update_plot)  # Link button to update function
+# make a slider to modify the radius
+slider_rad = Slider(slider_rad_axis, 'Radius', 1, (max_x - min_x) * 2**0.5, valinit=variogram_radius, valstep=1) 
+slider_rad.on_changed(update_rad) #add notifier
+#make a button to update everything
+button = Button(button_go_axis, 'Update') 
+button.on_clicked(update_plot)  #notifier
 
 #do an initial grid population
 do_thing(chart_resolution, variogram_radius)
