@@ -6,7 +6,7 @@ Kriging Interpolation is a standard interpolation method with primary use in geo
 
 # Covariance
 
-The variogram describes the spatial variance of random variables around a given point and models how this variance changes with distance. In other words, as linearly continuous data transitions relatively smoothly, the variogram provides a description of the average gradient. An optimal variogram can be fitted by calculating the empirical semi-variogram from the data and then finding a function of best fit through regression. For simplicy, a simple spherical variogram is used in this example.
+The variogram describes the spatial variance of random variables around a given point and models how this variance changes with distance. In other words, as linearly continuous data transitions relatively smoothly, the variogram provides a description of the average gradient. An optimal variogram can be fitted by calculating the empirical semi-variogram from the data and then finding a function of best fit through regression. For simplicity, a simple spherical variogram is used in this example.
 
 # Maximization
 
