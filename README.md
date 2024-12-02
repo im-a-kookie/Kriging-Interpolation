@@ -4,7 +4,7 @@ A simple example of Kriging Interpolation using Python and NumPy.
 
 Kriging Interpolation is a standard interpolation method with primary use in geostatics, providing unbiased linear prediction of values across linearly continuous datasets. Kriging interpolation can be broken down into two main components; the variogram and calculation of covariances, and the maximization of the resulting probability field.
 
-# Covariacce
+# Covariance
 
 The variogram describes the spatial variance of random variables around a given point and models how this variance changes with distance. In other words, as linearly continuous data transitions relatively smoothly, the variogram provides a description of the average gradient. An optimal variogram can be fitted by calculating the empirical semi-variogram from the data and then finding a function of best fit through regression. For simplicy, a simple spherical variogram is used in this example.
 
