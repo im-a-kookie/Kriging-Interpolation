@@ -10,7 +10,9 @@ The variogram describes the spatial variance of random variables around a given 
 
 # Maximization
 
-If a value Z is randomly guessed for a given point, the variogram models the probability of this guess being correct. Implicitly, this is maximized at the mean value of the probability distribution, so the mean regression provides the best linear estimate of Z. By constructing the variograms as a description of of residuals (rather than of the actual gradient itself), the sum of errors will implicitly converge to 0, meaning that this estimate is unbiased (aka, that it does not introduce systematic under- or over-estimation).
+Considering some unknown variable Z, the variogram describes the spatial correlation of Z with the known datapoints. Framed differently, this correlation informs the probability that some random guess for Z will be "correct," and implicit in probability theory is that mean probability informs function maxima.
+
+Therefore, implicitly, if we take the distance-weighted spatial correlation of Z with every known point, the conditional mean will provide the best linear estimate of Z. By constructing the variograms as a description of of residuals (rather than of the actual gradient itself), the sum of errors will implicitly converge to 0, meaning that this estimate is unbiased (aka, that it does not introduce systematic under- or over-estimation).
 
 # Summary
 
